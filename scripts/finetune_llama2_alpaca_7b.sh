@@ -1,11 +1,11 @@
 export WANDB_API_KEY=b7b6ecceb6854bd12f58809f18264f979509d13b
 export CUDA_HOME=/usr/local/cuda
-export CUDA_VISIBLE_DEVICES=7
+export CUDA_VISIBLE_DEVICES=4
 python qlora.py \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
     --use_auth \
-    --output_dir ./output/llama-2-guanaco-7b \
-    --logging_steps 10 \
+    --output_dir ./output/llama-2-alpaca-clean-7b \
+    --logging_steps 100 \
     --save_strategy steps \
     --data_seed 42 \
     --save_steps 500 \
@@ -32,7 +32,7 @@ python qlora.py \
     --warmup_ratio 0.03 \
     --lr_scheduler_type constant \
     --gradient_checkpointing \
-    --dataset oasst1 \
+    --dataset alpaca-clean \
     --source_max_len 16 \
     --target_max_len 512 \
     --per_device_train_batch_size 1 \
@@ -46,7 +46,7 @@ python qlora.py \
     --weight_decay 0.0 \
     --seed 0 \
     --save_interval 1 \
-    --save_dir /shared/dqwang/scratch/tongchen/qlora/llama2_7b_oasst1 \
+    --save_dir /shared/dqwang/scratch/tongchen/qlora/alpaca-clean \
     --report_to wandb \
     --wandb_project 'qlora-buffer' \
-    --run_name 'llama2_guanaco_7b' \
+    --run_name 'llama2_alpaca-clean_7b' \
