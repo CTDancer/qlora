@@ -1,0 +1,13 @@
+nohup: ignoring input
+Traceback (most recent call last):
+  File "/home/dqwang/scratch/tongchen/qlora/qlora.py", line 836, in <module>
+    train()
+  File "/home/dqwang/scratch/tongchen/qlora/qlora.py", line 670, in train
+    hfparser.parse_args_into_dataclasses(return_remaining_strings=True)
+  File "/home/dqwang/mambaforge/envs/ct/lib/python3.11/site-packages/transformers/hf_argparser.py", line 346, in parse_args_into_dataclasses
+    obj = dtype(**inputs)
+          ^^^^^^^^^^^^^^^
+  File "<string>", line 135, in __init__
+  File "/home/dqwang/mambaforge/envs/ct/lib/python3.11/site-packages/transformers/training_args.py", line 1297, in __post_init__
+    raise ValueError(
+ValueError: Your setup doesn't support bf16/gpu. You need torch>=1.10, using Ampere GPU with cuda>=11.0

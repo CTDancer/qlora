@@ -167,6 +167,14 @@ class TrainingArguments(transformers.Seq2SeqTrainingArguments):
         default='none',
         metadata={"help": "To use wandb or something else for reporting."}
     )
+    run_name: str = field(
+        default='none',
+        metadata={"help": "wandb run name"}
+    )
+    wandb_project: str = field(
+        default='qlora',
+        metadata={"help": "wandb project name"}
+    )
     output_dir: str = field(default='./output', metadata={"help": 'The output dir for logs and checkpoints'})
     optim: str = field(default='paged_adamw_32bit', metadata={"help": 'The optimizer to be used'})
     per_device_train_batch_size: int = field(default=1, metadata={"help": 'The training batch size per GPU. Increase for better speed.'})
@@ -185,6 +193,8 @@ class TrainingArguments(transformers.Seq2SeqTrainingArguments):
     save_strategy: str = field(default='steps', metadata={"help": 'When to save checkpoints'})
     save_steps: int = field(default=250, metadata={"help": 'How often to save a model'})
     save_total_limit: int = field(default=40, metadata={"help": 'How many checkpoints to save before the oldest is overwritten'})
+    save_interval: int = field(default=1, metadata={"help": "the save intervals for expert trajectories"})
+    save_dir: str = field(default='./expert_trajectories', metadata={"help": "the save dir for expert trajectories"})
 
 @dataclass
 class GenerationArguments:
@@ -675,6 +685,8 @@ def train():
     set_seed(args.seed)
 
     data_module = make_data_module(tokenizer=tokenizer, args=args)
+
+    os.environ["WANDB_PROJECT"] = args.wandb_project
     
     trainer = Seq2SeqTrainer(
         model=model,
@@ -767,12 +779,28 @@ def train():
         logger.info("*** Train ***")
         # Note: `resume_from_checkpoint` not supported for adapter checkpoints by HF.
         # Currently adapter checkpoint is reloaded as expected but optimizer/scheduler states are not.
-        train_result = trainer.train()
+        timestamps = []
+        trajectories = []
+        train_result, timestamps = trainer.train(timestamps=timestamps)
         metrics = train_result.metrics
         trainer.log_metrics("train", metrics)
         trainer.save_metrics("train", metrics)
         trainer.save_state()
         all_metrics.update(metrics)
+
+        print("timestamps length: ", len(timestamps))
+
+        if not os.path.exists(args.save_dir):
+            os.mkdir(args.save_dir)
+
+        trajectories.append(timestamps)
+        if len(trajectories) == args.save_interval:
+                n = 0
+                while os.path.exists(os.path.join(args.save_dir, "replay_buffer_{}.pt".format(n))):
+                    n += 1
+                print("Saving {}".format(os.path.join(args.save_dir, "replay_buffer_{}.pt".format(n))))
+                torch.save(trajectories, os.path.join(args.save_dir, "replay_buffer_{}.pt".format(n)))
+                trajectories = []
     # Evaluation
     if args.do_eval:
         logger.info("*** Evaluate ***")

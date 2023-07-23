@@ -1,3 +1,6 @@
+export WANDB_API_KEY=b7b6ecceb6854bd12f58809f18264f979509d13b
+export CUDA_HOME=/usr/local/cuda
+export CUDA_VISIBLE_DEVICES=3
 python qlora.py \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
     --use_auth \
@@ -42,3 +45,8 @@ python qlora.py \
     --lora_dropout 0.1 \
     --weight_decay 0.0 \
     --seed 0 \
+    --save_interval 1 \
+    --save_dir /shared/dqwang/scratch/tongchen/qlora/llama2_7b_oasst1 \
+    --report_to wandb \
+    --wandb_project 'qlora-buffer' \
+    --run_name 'llama2_guanaco_7b' \
