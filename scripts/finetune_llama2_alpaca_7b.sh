@@ -1,6 +1,6 @@
 export WANDB_API_KEY=b7b6ecceb6854bd12f58809f18264f979509d13b
 export CUDA_HOME=/usr/local/cuda
-export CUDA_VISIBLE_DEVICES=4
+export CUDA_VISIBLE_DEVICES=5
 python qlora.py \
     --model_name_or_path meta-llama/Llama-2-7b-hf \
     --use_auth \
@@ -27,7 +27,7 @@ python qlora.py \
     --lora_modules all \
     --double_quant \
     --quant_type nf4 \
-    # --bf16 \
+    --bf16 \
     --bits 4 \
     --warmup_ratio 0.03 \
     --lr_scheduler_type constant \

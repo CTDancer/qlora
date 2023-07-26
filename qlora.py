@@ -327,6 +327,7 @@ def get_accelerate_model(args, checkpoint_dir):
         use_fast=False, # Fast tokenizer giving issues.
         tokenizer_type='llama' if 'llama' in args.model_name_or_path else None, # Needed for HF name change
         use_auth_token=args.use_auth_token,
+        trust_remote_code=args.trust_remote_code,
     )
     if tokenizer._pad_token is None:
         smart_tokenizer_and_embedding_resize(
@@ -683,6 +684,19 @@ def train():
     model.config.use_cache = False
     print('loaded model')
     set_seed(args.seed)
+
+    # for k, v in model.named_parameters():
+    #     print(k, v)
+
+    # return None
+
+    wshape = None
+    for name, param in model.named_parameters():
+        if "embed_tokens" in name: 
+            wshape = param.shape
+            break
+
+    print("shape = ",wshape)
 
     data_module = make_data_module(tokenizer=tokenizer, args=args)
 
